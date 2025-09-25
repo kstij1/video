@@ -85,6 +85,21 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// Serve client build for SPA under a base path (e.g. /ai-video)
+const clientBuildPath = path.join(__dirname, '../client/build');
+if (fs.existsSync(clientBuildPath)) {
+  const basePath = process.env.NEXT_PUBLIC_API_BASE_PATH || process.env.REACT_APP_API_BASE_PATH || '/ai-video';
+  console.log('Serving client from', clientBuildPath, 'at base path', basePath);
+
+  // Static assets
+  app.use(basePath, express.static(clientBuildPath));
+
+  // SPA fallback for nested routes under the base path
+  app.get(`${basePath}/*`, (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+}
+
 // Auth/session check for clients to confirm Weam session
 app.get('/api/auth/me', (req, res) => {
   if (req.session && req.session.user) {
