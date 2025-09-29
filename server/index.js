@@ -39,6 +39,7 @@ const { weamSessionMiddleware } = require('./middleware/weamSession');
 const dbConnect = require('./lib/db'); // Import database connection
 const videoRoutes = require('./routes/videoRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const PORT = process.env.BACKEND_PORT || process.env.PORT || 5000;
@@ -67,6 +68,7 @@ dbConnect()
 // Routes
 app.use('/api/videos', videoRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/auth', authRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
