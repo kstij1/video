@@ -15,7 +15,8 @@ function weamSessionMiddleware() {
     password: password || 'change-me-in-env',
     cookieOptions: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production'
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
     }
   };
 

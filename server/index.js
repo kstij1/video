@@ -43,6 +43,8 @@ const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const PORT = process.env.BACKEND_PORT || process.env.PORT || 5000;
+const rawBasePath = process.env.NEXT_PUBLIC_API_BASE_PATH || process.env.REACT_APP_API_BASE_PATH || '/ai-video';
+const basePath = rawBasePath.startsWith('/') ? rawBasePath.replace(/\/$/, '') : `/${rawBasePath.replace(/\/$/, '')}`;
 
 // Middleware
 // Allow credentialed requests from the frontend so cookies are sent
@@ -65,18 +67,18 @@ dbConnect()
   process.exit(1);
 });
 
-// Routes
-app.use('/api/videos', videoRoutes);
-app.use('/api/chat', chatRoutes);
-app.use('/api/auth', authRoutes);
+// Routes (only under base path)
+app.use(`${basePath}/api/videos`, videoRoutes);
+app.use(`${basePath}/api/chat`, chatRoutes);
+app.use(`${basePath}/api/auth`, authRoutes);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get(`${basePath}/api/health`, (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
 // Test endpoint for debugging
-app.get('/api/test', (req, res) => {
+app.get(`${basePath}/api/test`, (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'Test endpoint working',
@@ -88,11 +90,12 @@ app.get('/api/test', (req, res) => {
 // Serve client build for SPA under a base path (e.g. /ai-video)
 const clientBuildPath = path.join(__dirname, '../client/build');
 if (fs.existsSync(clientBuildPath)) {
-  const basePath = process.env.NEXT_PUBLIC_API_BASE_PATH || process.env.REACT_APP_API_BASE_PATH || '/ai-video';
   console.log('Serving client from', clientBuildPath, 'at base path', basePath);
 
   // Static assets
   app.use(basePath, express.static(clientBuildPath));
+
+  // APIs are only exposed under basePath above
 
   // SPA fallback for nested routes under the base path
   app.get(`${basePath}/*`, (req, res) => {
@@ -101,7 +104,7 @@ if (fs.existsSync(clientBuildPath)) {
 }
 
 // Auth/session check for clients to confirm Weam session
-app.get('/api/auth/me', (req, res) => {
+app.get(`${basePath}/api/auth/me`, (req, res) => {
   if (req.session && req.session.user) {
     return res.json({ authenticated: true, user: req.session.user });
   }
