@@ -4,7 +4,7 @@ import { Play, Pause, Scissors, Square, Music, Download, Save, ChevronLeft, Hist
 import { useVideo } from '../context/VideoContext';
 import toast from 'react-hot-toast';
 
-const apiBase = process.env.REACT_APP_API_BASE || 'http://localhost:3004/api';
+const apiBase = 'http://localhost:3009/api';
 
 export default function VideoEditor() {
   const { videoId } = useParams();

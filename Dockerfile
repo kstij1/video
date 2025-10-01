@@ -40,12 +40,12 @@ COPY --from=builder /app/client/package.json ./client/
 # Set ownership
 RUN chown -R appuser:nodejs /app
 USER appuser
-# Expose ports (defaults, can be overridden)
-EXPOSE 3004 3001
-# Set default ports (can be overridden with -e PORT=xxx -e FRONTEND_PORT=xxx)
-ENV BACKEND_PORT=3004
-ENV FRONTEND_PORT=3001
-ENV PORT=3004
+# Expose ports
+EXPOSE 3009 3008
+# Hardcode ports for runtime
+ENV BACKEND_PORT=3009
+ENV FRONTEND_PORT=3008
+ENV PORT=3009
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:${BACKEND_PORT}/api/health || exit 1

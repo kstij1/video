@@ -1,9 +1,7 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = function(app) {
-  const target = process.env.BACKEND_PORT
-    ? `http://localhost:${process.env.BACKEND_PORT}`
-    : 'http://localhost:3004';
+  const target = 'http://localhost:3009';
 
   app.use(
     // Only proxy API calls under /ai-video

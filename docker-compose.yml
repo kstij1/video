@@ -4,12 +4,12 @@ services:
   ai-videogen:
     build: .
     ports:
-      - "${BACKEND_PORT:-3004}:${BACKEND_PORT:-3004}"
-      - "${FRONTEND_PORT:-3001}:${FRONTEND_PORT:-3001}"
+      - "3009:3009"
+      - "3008:3008"
     environment:
       - NODE_ENV=production
-      - BACKEND_PORT=${BACKEND_PORT:-3004}
-      - FRONTEND_PORT=${FRONTEND_PORT:-3001}
+      - BACKEND_PORT=3009
+      - FRONTEND_PORT=3008
       - RUNWAY_API_KEY=${RUNWAY_API_KEY}
       - BANANA_API_KEY=${BANANA_API_KEY}
       - VEO3_API_KEY=${VEO3_API_KEY}
@@ -22,7 +22,7 @@ services:
       - .env
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${BACKEND_PORT:-3004}/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3009/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
