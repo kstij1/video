@@ -58,7 +58,8 @@ async function requireWeamAuth(req, res, next) {
   }
 
   if (!req.session || !req.session.user) {
-    return res.status(401).json({ error: 'Unauthorized: Weam session not found' });
+    // Per Weam standards, hide auth status behind 404
+    return res.status(404).json({ error: 'Not found' });
   }
 
   // Call check-access API for every protected route access
@@ -74,12 +75,12 @@ async function requireWeamAuth(req, res, next) {
       );
       
       if (!hasAccess) {
-        console.log('Access denied, returning 401');
-        return res.status(401).json({ error: 'Access denied' });
+        console.log('Access denied, returning 404');
+        return res.status(404).json({ error: 'Not found' });
       }
     } catch (error) {
       console.error('Error in middleware check-access call:', error);
-      return res.status(401).json({ error: 'Access check failed' });
+      return res.status(404).json({ error: 'Not found' });
     }
   }
 

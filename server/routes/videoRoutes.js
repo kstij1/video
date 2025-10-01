@@ -446,7 +446,7 @@ router.patch('/:videoId/title', requireWeamAuth, async (req, res) => {
     }
 
     const video = await Video.findOneAndUpdate(
-      { videoId },
+      { videoId, 'user.id': req.user._id },
       { title },
       { new: true }
     );
@@ -474,7 +474,7 @@ router.patch('/:videoId/prompt', requireWeamAuth, async (req, res) => {
     }
 
     const video = await Video.findOneAndUpdate(
-      { videoId },
+      { videoId, 'user.id': req.user._id },
       { prompt },
       { new: true }
     );
@@ -509,7 +509,7 @@ router.patch('/:videoId/edit', requireWeamAuth, async (req, res) => {
     }
 
     const video = await Video.findOneAndUpdate(
-      { videoId },
+      { videoId, 'user.id': req.user._id },
       updateData,
       { new: true }
     );
@@ -621,7 +621,7 @@ router.get('/:videoId/edits', requireWeamAuth, async (req, res) => {
 router.post('/:videoId/regenerate', requireWeamAuth, async (req, res) => {
   try {
     const { videoId } = req.params;
-    const originalVideo = await Video.findOne({ videoId });
+    const originalVideo = await Video.findOne({ videoId, 'user.id': req.user._id });
 
     if (!originalVideo) {
       return res.status(404).json({ error: 'Video not found' });
@@ -641,7 +641,18 @@ router.post('/:videoId/regenerate', requireWeamAuth, async (req, res) => {
       duration: originalVideo.duration,
       aspectRatio: originalVideo.aspectRatio,
       runwayJobId: runwayResponse.id || runwayResponse.job_id,
-      status: 'queued'
+      status: 'queued',
+      model: originalVideo.model,
+      quality: originalVideo.quality,
+      user: {
+        id: req.user._id,
+        email: req.user.email
+      },
+      companyId: req.user.companyId,
+      createdBy: {
+        id: req.user._id,
+        email: req.user.email
+      }
     });
 
     await newVideo.save();
@@ -672,7 +683,7 @@ router.post('/:videoId/regenerate', requireWeamAuth, async (req, res) => {
 router.delete('/:videoId', requireWeamAuth, async (req, res) => {
   try {
     const { videoId } = req.params;
-    const video = await Video.findOneAndDelete({ videoId });
+    const video = await Video.findOneAndDelete({ videoId, 'user.id': req.user._id });
 
     if (!video) {
       return res.status(404).json({ error: 'Video not found' });
