@@ -19,3 +19,6 @@ config.env
 # OS files
 .DS_Store
 Thumbs.db
+
+client/node_modules/
+

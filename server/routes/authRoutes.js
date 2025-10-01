@@ -11,7 +11,7 @@ router.post('/check-access', async (req, res) => {
     if (!userId || !urlPath) {
       return res.status(400).json({ error: 'Missing required fields: userId and urlPath are required' });
     }
-    
+
     // Call the external API
     const baseUrl = getHostnameFromRequest(req);
     const externalApiUrl = `${baseUrl}/napi/v1/common/check-access-solution`;
