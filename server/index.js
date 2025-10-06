@@ -72,8 +72,18 @@ app.use(`${basePath}/api/videos`, videoRoutes);
 app.use(`${basePath}/api/chat`, chatRoutes);
 app.use(`${basePath}/api/auth`, authRoutes);
 
+// Fallback: also mount unprefixed routes to support proxies that strip the base path
+app.use('/api/videos', videoRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/auth', authRoutes);
+
 // Health check endpoint
 app.get(`${basePath}/api/health`, (req, res) => {
+  res.json({ status: 'OK', message: 'Server is running' });
+});
+
+// Fallback health without base path
+app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
@@ -105,6 +115,14 @@ if (fs.existsSync(clientBuildPath)) {
 
 // Auth/session check for clients to confirm Weam session
 app.get(`${basePath}/api/auth/me`, (req, res) => {
+  if (req.session && req.session.user) {
+    return res.json({ authenticated: true, user: req.session.user });
+  }
+  return res.status(401).json({ authenticated: false, error: 'No Weam session' });
+});
+
+// Fallback auth/me without base path
+app.get('/api/auth/me', (req, res) => {
   if (req.session && req.session.user) {
     return res.json({ authenticated: true, user: req.session.user });
   }

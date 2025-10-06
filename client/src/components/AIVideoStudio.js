@@ -37,6 +37,7 @@ const AIVideoStudio = () => {
   const [aspectRatio, setAspectRatio] = useState('16:9');
   const [selectedVideo, setSelectedVideo] = useState(null);
   const messagesEndRef = useRef(null);
+  const [me, setMe] = useState(null);
 
   useEffect(() => {
     fetchVideos();
@@ -64,6 +65,21 @@ const AIVideoStudio = () => {
             const first = order.find(o => data[o.key]);
             if (first) setSelectedModel(first.label);
           }
+        }
+      } catch (_) {}
+    })();
+  }, []);
+
+  useEffect(() => {
+    // Fetch logged-in user for header avatar
+    (async () => {
+      try {
+        const rawBasePath = process.env.NEXT_PUBLIC_API_BASE_PATH || process.env.REACT_APP_API_BASE_PATH || '/ai-video';
+        const basePath = rawBasePath.startsWith('/') ? rawBasePath.replace(/\/$/, '') : `/${rawBasePath.replace(/\/$/, '')}`;
+        const res = await fetch(`${basePath}/api/auth/me`, { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.authenticated) setMe(data.user);
         }
       } catch (_) {}
     })();
@@ -181,7 +197,17 @@ const AIVideoStudio = () => {
             </div>
           </div>
           
-          {/* Removed tagline */}
+          {/* User profile chip */}
+          {me && (
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg border border-gray-200 bg-white">
+              <div className="w-6 h-6 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs">
+                {(me.name || me.email || 'U').slice(0,1).toUpperCase()}
+              </div>
+              <div className="text-sm text-gray-700 max-w-[160px] truncate" title={me.name || me.email}>
+                {me.name || me.email}
+              </div>
+            </div>
+          )}
         </div>
       </motion.header>
 
