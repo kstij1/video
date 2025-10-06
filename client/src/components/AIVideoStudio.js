@@ -47,7 +47,8 @@ const AIVideoStudio = () => {
     // Fetch provider availability once on mount
     (async () => {
       try {
-        const basePath = process.env.NEXT_PUBLIC_API_BASE_PATH || process.env.REACT_APP_API_BASE_PATH || '';
+        const rawBasePath = process.env.NEXT_PUBLIC_API_BASE_PATH || process.env.REACT_APP_API_BASE_PATH || '/ai-video';
+        const basePath = rawBasePath.startsWith('/') ? rawBasePath.replace(/\/$/, '') : `/${rawBasePath.replace(/\/$/, '')}`;
         const res = await fetch(`${basePath}/api/videos/providers`, { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();

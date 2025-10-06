@@ -4,7 +4,9 @@ import { Play, Pause, Scissors, Square, Music, Download, Save, ChevronLeft, Hist
 import { useVideo } from '../context/VideoContext';
 import toast from 'react-hot-toast';
 
-const apiBase = 'http://localhost:3009/api';
+const rawBasePath = process.env.NEXT_PUBLIC_API_BASE_PATH || process.env.REACT_APP_API_BASE_PATH || '/ai-video';
+const basePath = rawBasePath.startsWith('/') ? rawBasePath.replace(/\/$/, '') : `/${rawBasePath.replace(/\/$/, '')}`;
+const apiBase = `${basePath}/api`;
 
 export default function VideoEditor() {
   const { videoId } = useParams();
