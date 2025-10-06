@@ -9,7 +9,11 @@ import { ChatProvider } from './context/ChatContext';
 import SessionValidator from './components/providers/SessionValidator';
 
 function App() {
-  const basePath = process.env.NEXT_PUBLIC_API_BASE_PATH || process.env.REACT_APP_API_BASE_PATH || '/ai-video';
+  // Auto-detect base path from window location when deployed under a subpath
+  const envBase = process.env.NEXT_PUBLIC_API_BASE_PATH || process.env.REACT_APP_API_BASE_PATH;
+  const inferredBase = typeof window !== 'undefined' && window.location.pathname.startsWith('/ai-video') ? '/ai-video' : '/';
+  const rawBasePath = envBase || inferredBase || '/ai-video';
+  const basePath = rawBasePath.startsWith('/') ? rawBasePath.replace(/\/$/, '') : `/${rawBasePath.replace(/\/$/, '')}`;
   if (typeof window !== 'undefined' && window.location.pathname === '/') {
     window.location.replace(basePath);
     return null;

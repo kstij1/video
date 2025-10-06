@@ -42,6 +42,8 @@ const chatRoutes = require('./routes/chatRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 const app = express();
+// Behind reverse proxies (nginx), trust X-Forwarded-* headers so cookies/csrf work
+app.set('trust proxy', 1);
 const PORT = 3009;
 const rawBasePath = process.env.NEXT_PUBLIC_API_BASE_PATH || process.env.REACT_APP_API_BASE_PATH || '/ai-video';
 const basePath = rawBasePath.startsWith('/') ? rawBasePath.replace(/\/$/, '') : `/${rawBasePath.replace(/\/$/, '')}`;
