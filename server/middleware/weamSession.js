@@ -12,6 +12,14 @@ function weamSessionMiddleware() {
         if (session && session.user) {
           req.user = session.user;
         }
+
+        // If bypass is enabled, synthesize a dev user for all requests
+        const bypassAuth = String(process.env.WEAM_AUTH_BYPASS).trim().toLowerCase() === 'true';
+        if (bypassAuth) {
+          const devUser = { _id: 'dev-user', email: 'dev@local', companyId: 'dev-company', roleCode: 'USER' };
+          if (!req.user) req.user = devUser;
+          if (!req.session.user) req.session.user = devUser;
+        }
         next();
       })
       .catch(next);
