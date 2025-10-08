@@ -50,10 +50,14 @@ async function callCheckAccessAPI(userId, urlPath, baseUrl) {
 // Guard middleware for routes that require authentication with access control
 async function requireWeamAuth(req, res, next) {
   // Allow bypass ONLY when explicitly enabled
-  const bypassAuth = process.env.WEAM_AUTH_BYPASS === 'true';
+  const bypassAuth = String(process.env.WEAM_AUTH_BYPASS).trim().toLowerCase() === 'true';
   if (bypassAuth) {
     // Synthesize a minimal dev user so downstream code works
-    req.user = req.user || { _id: 'dev-user', email: 'dev@local', companyId: 'dev-company' };
+    const devUser = { _id: 'dev-user', email: 'dev@local', companyId: 'dev-company', roleCode: 'USER' };
+    req.user = req.user || devUser;
+    // Ensure session shape also looks authenticated for routes that read req.session.user
+    if (!req.session) req.session = {};
+    if (!req.session.user) req.session.user = devUser;
     return next();
   }
 
