@@ -48,9 +48,8 @@ const AIVideoStudio = () => {
     // Fetch provider availability once on mount
     (async () => {
       try {
-        const rawBasePath = process.env.NEXT_PUBLIC_API_BASE_PATH || process.env.REACT_APP_API_BASE_PATH || '/ai-video';
-        const basePath = rawBasePath.startsWith('/') ? rawBasePath.replace(/\/$/, '') : `/${rawBasePath.replace(/\/$/, '')}`;
-        const res = await fetch(`${basePath}/api/videos/providers`, { credentials: 'include' });
+        const res = await fetch('/api/videos/providers', { credentials: 'include' });
+        
         if (res.ok) {
           const data = await res.json();
           setProviderAvailability(data || {});
@@ -74,9 +73,8 @@ const AIVideoStudio = () => {
     // Fetch logged-in user for header avatar
     (async () => {
       try {
-        const rawBasePath = process.env.NEXT_PUBLIC_API_BASE_PATH || process.env.REACT_APP_API_BASE_PATH || '/ai-video';
-        const basePath = rawBasePath.startsWith('/') ? rawBasePath.replace(/\/$/, '') : `/${rawBasePath.replace(/\/$/, '')}`;
-        const res = await fetch(`${basePath}/api/auth/me`, { credentials: 'include' });
+        const res = await fetch('/api/auth/me', { credentials: 'include' });
+        
         if (res.ok) {
           const data = await res.json();
           if (data?.authenticated) setMe(data.user);
