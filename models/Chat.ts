@@ -1,0 +1,28 @@
+import mongoose, { Schema, models, model } from 'mongoose'
+
+const MessageSchema = new Schema({
+  id: { type: String, required: true },
+  role: { type: String, enum: ['user', 'assistant'], required: true },
+  content: { type: String, required: true },
+  videoUrl: { type: String },
+  createdAt: { type: Date, default: Date.now },
+})
+
+const ChatSchema = new Schema({
+  threadId: { type: String, required: true, unique: true },
+  title: { type: String, required: true },
+  messages: { type: [MessageSchema], default: [] },
+  user: {
+    id: { type: String, required: false },
+    email: { type: String, required: false },
+  },
+  companyId: { type: String, required: false },
+  updatedAt: { type: Date, default: Date.now },
+}, { timestamps: { createdAt: true, updatedAt: true }, collection: 'solution_aivideo_chats' })
+
+export type MessageDoc = mongoose.InferSchemaType<typeof MessageSchema>
+export type ChatDoc = mongoose.InferSchemaType<typeof ChatSchema>
+
+export default models.Chat || model('Chat', ChatSchema)
+
+
