@@ -20,5 +20,5 @@ config.env
 .DS_Store
 Thumbs.db
 
-client/node_modules/
+node_modules/
 
