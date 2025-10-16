@@ -23,12 +23,18 @@ export default function Sidebar({ onSelectThread, onNewChat, currentThreadId }: 
       <div className="p-4 sticky top-0 bg-white border-b border-violet-200 z-10">
         <div className="flex items-center justify-between mb-2">
           <div className="text-sm font-medium text-neutral-700">History</div>
-          <button className="text-xs h-8 px-3 rounded-lg border border-violet-200 hover:bg-violet-50" onClick={() => onNewChat()}>New</button>
+          <button
+            className="text-xs h-8 px-3 rounded-lg border border-violet-200 hover:bg-violet-50"
+            onClick={() => onNewChat()}
+          >New</button>
         </div>
         <input
           className="w-full h-10 text-sm"
           placeholder="Search chats..."
-          onChange={(e) => { const q = e.target.value.toLowerCase(); setThreads(prev => prev.filter(t => !q || t.title.toLowerCase().includes(q))) }}
+          onChange={(e) => {
+            const q = e.target.value.toLowerCase()
+            setThreads(prev => prev.filter(t => !q || t.title.toLowerCase().includes(q)))
+          }}
         />
       </div>
       <div className="p-3 space-y-2 overflow-y-auto thin-scrollbar">

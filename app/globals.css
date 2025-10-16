@@ -26,18 +26,12 @@ button.primary {
   @apply bg-white border border-violet-200 rounded-lg;
 }
 
-.kbd {
-  @apply inline-flex items-center justify-center px-1.5 py-0.5 border border-violet-200 rounded text-[11px] text-neutral-600 bg-white;
-}
-
-/* Consistent focus styles */
+ 
 input:focus, select:focus, textarea:focus, button:focus {
   @apply outline-none ring-2 ring-violet-300 border-violet-300;
 }
 
-/* Subtle scrollbar */
 .thin-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
 .thin-scrollbar::-webkit-scrollbar-thumb { @apply bg-violet-200 rounded; }
 .thin-scrollbar::-webkit-scrollbar-track { @apply bg-transparent; }
-
 

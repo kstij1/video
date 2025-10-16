@@ -61,7 +61,6 @@ export default function Home() {
           className="text-xs px-3 h-8 rounded border border-violet-200 hover:bg-violet-50"
           onClick={() => history.back()}
         >Back</button>
-        {/* Title removed per request */}
       </div>
       <div className="flex items-center gap-2 text-sm text-neutral-600">
         <select className="h-9" value={model} onChange={(e) => setModel(e.target.value)}>
