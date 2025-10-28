@@ -26,25 +26,36 @@ export default function Home() {
     setInput('')
     setLoading(true)
     try {
-      // Ensure a thread exists
-      let tid = threadId
-      if (!tid) {
+      // If no existing thread, create it and start a fresh generation
+      if (!threadId) {
         const newThread = await axios.post('/aivideo/api/threads', { title: text.slice(0, 80) })
-        tid = newThread.data.threadId
+        const tid = newThread.data.threadId
         setThreadId(tid)
+        await axios.post(`/aivideo/api/threads/${tid}`, { role: 'user', content: text })
+        const res = await axios.post('/aivideo/api/video/generate', {
+          prompt: text,
+          duration,
+          aspectRatio: aspect,
+          model,
+        })
+        const pretty = 'Job created.\n\n' + JSON.stringify(res.data, null, 2)
+        setMessages((m) => [...m, { id: crypto.randomUUID(), role: 'assistant', content: pretty }])
+        await axios.post(`/aivideo/api/threads/${tid}`, { role: 'assistant', content: pretty })
+      } else {
+        // Use iterative refinement on existing thread
+        const tid = threadId
+        await axios.post(`/aivideo/api/threads/${tid}`, { role: 'user', content: text })
+        const res = await axios.post('/aivideo/api/video/refine', {
+          threadId: tid,
+          refinement: text,
+          duration,
+          aspectRatio: aspect,
+          model,
+        })
+        const pretty = 'Refined job created.\n\n' + JSON.stringify(res.data, null, 2)
+        setMessages((m) => [...m, { id: crypto.randomUUID(), role: 'assistant', content: pretty }])
+        await axios.post(`/aivideo/api/threads/${tid}`, { role: 'assistant', content: pretty })
       }
-      // Persist user message
-      await axios.post(`/aivideo/api/threads/${tid}`, { role: 'user', content: text })
-      const res = await axios.post('/aivideo/api/video/generate', {
-        prompt: text,
-        duration,
-        aspectRatio: aspect,
-        model,
-      })
-      const pretty = 'Job created.\n\n' + JSON.stringify(res.data, null, 2)
-      setMessages((m) => [...m, { id: crypto.randomUUID(), role: 'assistant', content: pretty }])
-      // Persist assistant message
-      await axios.post(`/aivideo/api/threads/${tid}`, { role: 'assistant', content: pretty })
     } catch (e: any) {
       const errText = e?.response?.data?.error || e.message
       setMessages((m) => [...m, { id: crypto.randomUUID(), role: 'assistant', content: `Error: ${errText}` }])
@@ -96,7 +107,18 @@ export default function Home() {
         {header}
         <div ref={scrollerRef} className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-white to-violet-50/40 thin-scrollbar">
           {messages.map((m) => (
-            <MessageBubble key={m.id} role={m.role} videoUrl={m.videoUrl}>{m.content}</MessageBubble>
+            <MessageBubble
+              key={m.id}
+              role={m.role}
+              videoUrl={m.videoUrl}
+              onEdit={m.videoUrl ? () => {
+                const params = new URLSearchParams()
+                if (threadId) params.set('threadId', threadId)
+                params.set('messageId', m.id)
+                params.set('videoUrl', m.videoUrl)
+                location.href = `/aivideo/editor?${params.toString()}`
+              } : undefined}
+            >{m.content}</MessageBubble>
           ))}
         </div>
         <div className="border-t border-violet-200 p-4 bg-white">

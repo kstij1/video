@@ -23,4 +23,11 @@ export async function POST(request: Request, { params }: { params: { threadId: s
   return new Response(JSON.stringify({ ok: true, message }), { status: 201 })
 }
 
+export async function DELETE(_: Request, { params }: { params: { threadId: string } }) {
+  await connectToDatabase()
+  const result = await Chat.deleteOne({ threadId: params.threadId })
+  if (result.deletedCount === 0) return new Response(JSON.stringify({ error: 'Not found' }), { status: 404 })
+  return new Response(JSON.stringify({ ok: true, deleted: params.threadId }), { status: 200 })
+}
+
 

@@ -16,4 +16,10 @@ export async function POST(request: Request) {
   return new Response(JSON.stringify({ threadId, chat: { threadId, title: chat.title, updatedAt: chat.updatedAt } }), { status: 201 })
 }
 
+export async function DELETE() {
+  await connectToDatabase()
+  await Chat.deleteMany({})
+  return new Response(JSON.stringify({ ok: true, deletedAll: true }), { status: 200 })
+}
+
 

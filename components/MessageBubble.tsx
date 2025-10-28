@@ -4,9 +4,10 @@ type MessageBubbleProps = {
   role: 'user' | 'assistant' | 'system'
   children: ReactNode
   videoUrl?: string
+  onEdit?: () => void
 }
 
-export default function MessageBubble({ role, children, videoUrl }: MessageBubbleProps) {
+export default function MessageBubble({ role, children, videoUrl, onEdit }: MessageBubbleProps) {
   const isUser = role === 'user'
   const isAssistant = role === 'assistant'
 
@@ -25,7 +26,16 @@ export default function MessageBubble({ role, children, videoUrl }: MessageBubbl
         {children}
         {videoUrl && (
           <div className="mt-3">
-            <video className="w-full rounded" controls src={videoUrl} />
+            <div className="relative">
+              <video className="w-full rounded" controls src={videoUrl} />
+              {onEdit && (
+                <button
+                  className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-black/60 text-white hover:bg-black/80"
+                  onClick={onEdit}
+                  aria-label="Edit video"
+                >Edit</button>
+              )}
+            </div>
           </div>
         )}
       </div>
