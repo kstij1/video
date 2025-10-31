@@ -18,6 +18,10 @@ export default function Home() {
   const [aspect, setAspect] = useState('16:9')
   const [model, setModel] = useState('gen4_turbo')
   const scrollerRef = useRef<HTMLDivElement>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  // NEW: Track 404 for access-denied experience
+  const [noAccess, setNoAccess] = useState(false);
 
   const submit = async (text: string) => {
     if (!text.trim()) return
@@ -31,6 +35,7 @@ export default function Home() {
         const newThread = await axios.post('/aivideo/api/threads', { title: text.slice(0, 80) })
         const tid = newThread.data.threadId
         setThreadId(tid)
+        setRefreshKey((k) => k + 1)
         await axios.post(`/aivideo/api/threads/${tid}`, { role: 'user', content: text })
         const res = await axios.post('/aivideo/api/video/generate', {
           prompt: text,
@@ -57,12 +62,25 @@ export default function Home() {
         await axios.post(`/aivideo/api/threads/${tid}`, { role: 'assistant', content: pretty })
       }
     } catch (e: any) {
-      const errText = e?.response?.data?.error || e.message
-      setMessages((m) => [...m, { id: crypto.randomUUID(), role: 'assistant', content: `Error: ${errText}` }])
+      // CATCH 404: user not authenticated case
+      if (e?.response?.status === 404) {
+        setNoAccess(true);
+        setMessages([]); // optional: clear old messages
+      } else {
+        const errText = e?.response?.data?.error || e.message
+        setMessages((m) => [...m, { id: crypto.randomUUID(), role: 'assistant', content: `Error: ${errText}` }])
+      }
     } finally {
       setLoading(false)
       setTimeout(() => scrollerRef.current?.scrollTo({ top: scrollerRef.current.scrollHeight, behavior: 'smooth' }), 0)
     }
+  }
+
+  // --- Optionally, also guard the main load for 404 ----
+  // If loading data on mount, add similar catch around axios calls
+
+  if (noAccess) {
+    return <div className="flex items-center justify-center h-screen text-2xl text-red-500 font-semibold">Access Denied. Please login to WEAM.</div>;
   }
 
   const header = useMemo(() => (
@@ -93,10 +111,12 @@ export default function Home() {
 
   return (
     <div className="h-screen grid grid-cols-[auto_1fr] bg-white">
-      <Sidebar currentThreadId={threadId} onNewChat={() => {
+      <Sidebar currentThreadId={threadId} refreshKey={refreshKey} onNewChat={() => {
         setThreadId(null)
         setMessages([{ id: crypto.randomUUID(), role: 'assistant', content: 'Hi! Describe a video you want to generate.' }])
         setInput('')
+        // bump key to refresh sidebar history immediately
+        setRefreshKey((k) => k + 1)
       }} onSelectThread={async (tid) => {
         setThreadId(tid)
         const res = await axios.get(`/aivideo/api/threads/${tid}`)

@@ -1,4 +1,4 @@
-// File: /Users/kshitijvarma/Desktop/AI-VideoGen/app/layout.tsx
+// File: /Users/kshitijvarma/Desktop/sjdnskfjdvnbdjkbvn/AI-VideoGen/app/layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

@@ -12,6 +12,8 @@ const ChatSchema = new Schema({
   threadId: { type: String, required: true, unique: true },
   title: { type: String, required: true },
   messages: { type: [MessageSchema], default: [] },
+  userId: { type: String, required: true }, // enforce user-level isolation
+  companyId: { type: String, required: true }, // NEW: company-level isolation
   updatedAt: { type: Date, default: Date.now },
 }, { timestamps: { createdAt: true, updatedAt: true } })
 
